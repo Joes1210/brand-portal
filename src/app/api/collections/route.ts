@@ -14,7 +14,7 @@ export async function GET() {
   }
 
   try {
-    const rootPath = process.env.DROPBOX_ROOT_FOLDER ?? ''
+const rootPath = ''
     const collections = await buildCollections(rootPath)
 
     return NextResponse.json({
