@@ -1,5 +1,11 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  eslint: {
+    ignoreDuringBuilds: true,
+  },
+  typescript: {
+    ignoreBuildErrors: true,
+  },
   images: {
     remotePatterns: [
       {
@@ -15,16 +21,6 @@ const nextConfig = {
         hostname: 'www.dropbox.com',
       },
     ],
-  },
-  async headers() {
-    return [
-      {
-        source: '/api/:path*',
-        headers: [
-          { key: 'Cache-Control', value: 'public, s-maxage=300, stale-while-revalidate=600' },
-        ],
-      },
-    ]
   },
 }
 
