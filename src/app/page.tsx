@@ -29,7 +29,7 @@ export default function HomePage() {
     { label: 'Total Assets', value: assets.length || '—' },
     { label: 'Collections', value: collections.length || '—' },
     { label: 'New This Week', value: assets.filter(a => a.isNew).length || '—' },
-   { label: 'File Types', value: Array.from(new Set(assets.map(a => a.type))).length || '—' },
+   { label: 'File Types', value: Array.from(Array.from(new Set(assets.map(a => a.type))).length,
   ]
 
   return (
