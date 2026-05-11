@@ -1,25 +1,5 @@
 {
   "buildCommand": "npm run build",
   "framework": "nextjs",
-  "outputDirectory": ".next",
-  "installCommand": "npm install",
-  "env": {
-    "DROPBOX_ACCESS_TOKEN": "@dropbox-access-token",
-    "DROPBOX_SHARED_LINK_URL": "@dropbox-shared-link-url",
-    "DROPBOX_ROOT_FOLDER": "@dropbox-root-folder",
-    "NEXT_PUBLIC_APP_NAME": "@app-name",
-    "NEXT_PUBLIC_APP_TAGLINE": "@app-tagline",
-    "NEXT_PUBLIC_BRAND_COLOR": "@brand-color"
-  },
-  "headers": [
-    {
-      "source": "/api/(.*)",
-      "headers": [
-        {
-          "key": "Cache-Control",
-          "value": "public, s-maxage=300, stale-while-revalidate=600"
-        }
-      ]
-    }
-  ]
+  "outputDirectory": ".next"
 }
