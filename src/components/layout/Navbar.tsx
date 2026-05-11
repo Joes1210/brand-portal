@@ -45,7 +45,7 @@ export function Navbar({ onSearchOpen }: NavbarProps) {
           {/* Logo */}
           <Link href="/" className="flex items-center gap-3 group shrink-0">
             <img
-              src="/Logo_3d.png"
+              src="./Logo_3d.png"
               alt="Grab & Go"
               className="h-10 w-auto transition-transform duration-300 group-hover:scale-105"
             />
