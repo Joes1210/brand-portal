@@ -16,7 +16,7 @@ export async function GET() {
   }
 
   try {
-    const rootPath = process.env.DROPBOX_ROOT_FOLDER ?? ''
+const rootPath = ''
     const assets = await fetchAllAssets(rootPath)
 
     return NextResponse.json({
