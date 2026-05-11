@@ -1,0 +1,187 @@
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&family=DM+Mono:wght@300;400;500&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ── CSS Custom Properties ─────────────────────────────────── */
+:root {
+  --font-display: 'Cormorant Garamond', serif;
+  --font-body: 'DM Sans', sans-serif;
+  --font-mono: 'DM Mono', monospace;
+
+  /* Light theme */
+  --bg-primary: #faf8f5;
+  --bg-secondary: #f0ebe3;
+  --bg-card: #ffffff;
+  --bg-glass: rgba(255, 255, 255, 0.7);
+  --border-color: rgba(139, 94, 60, 0.15);
+  --text-primary: #1a0f09;
+  --text-secondary: #5a3a23;
+  --text-muted: #9a7860;
+  --accent: #8B5E3C;
+  --accent-light: #c09d7d;
+  --accent-dark: #5a3a23;
+  --shadow-card: 0 1px 3px rgba(26, 15, 9, 0.08), 0 4px 16px rgba(26, 15, 9, 0.06);
+  --shadow-hover: 0 8px 32px rgba(26, 15, 9, 0.14), 0 2px 8px rgba(26, 15, 9, 0.08);
+  --gradient-hero: linear-gradient(135deg, #faf8f5 0%, #f0ebe3 50%, #e8ddd0 100%);
+}
+
+.dark {
+  --bg-primary: #0c0a09;
+  --bg-secondary: #1a0f09;
+  --bg-card: #1c1917;
+  --bg-glass: rgba(28, 25, 23, 0.8);
+  --border-color: rgba(192, 157, 125, 0.12);
+  --text-primary: #f5f0eb;
+  --text-secondary: #d4bfa8;
+  --text-muted: #9a7860;
+  --accent: #c09d7d;
+  --accent-light: #d4bfa8;
+  --accent-dark: #a87c58;
+  --shadow-card: 0 1px 3px rgba(0, 0, 0, 0.4), 0 4px 16px rgba(0, 0, 0, 0.3);
+  --shadow-hover: 0 8px 32px rgba(0, 0, 0, 0.5), 0 2px 8px rgba(0, 0, 0, 0.3);
+  --gradient-hero: linear-gradient(135deg, #0c0a09 0%, #1a0f09 50%, #2d1d11 100%);
+}
+
+/* ── Base styles ───────────────────────────────────────────── */
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  font-family: var(--font-body);
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* ── Typography ────────────────────────────────────────────── */
+.font-display { font-family: var(--font-display); }
+.font-body    { font-family: var(--font-body); }
+.font-mono    { font-family: var(--font-mono); }
+
+/* ── Scrollbar ──────────────────────────────────────────────── */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb {
+  background: var(--accent);
+  border-radius: 3px;
+  opacity: 0.5;
+}
+::-webkit-scrollbar-thumb:hover { opacity: 1; }
+
+/* ── Selection ──────────────────────────────────────────────── */
+::selection {
+  background: var(--accent);
+  color: var(--bg-primary);
+}
+
+/* ── Glass morphism ─────────────────────────────────────────── */
+.glass {
+  background: var(--bg-glass);
+  backdrop-filter: blur(12px) saturate(1.8);
+  -webkit-backdrop-filter: blur(12px) saturate(1.8);
+  border: 1px solid var(--border-color);
+}
+
+/* ── Skeleton loader ────────────────────────────────────────── */
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    var(--bg-secondary) 25%,
+    var(--bg-card) 50%,
+    var(--bg-secondary) 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
+
+@keyframes shimmer {
+  0%   { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* ── Focus ring ─────────────────────────────────────────────── */
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* ── Transitions ────────────────────────────────────────────── */
+.transition-expo {
+  transition-timing-function: cubic-bezier(0.19, 1, 0.22, 1);
+}
+
+/* ── Asset grid masonry ─────────────────────────────────────── */
+.masonry-grid {
+  display: flex;
+  margin-left: -16px;
+  width: auto;
+}
+
+.masonry-grid-column {
+  padding-left: 16px;
+  background-clip: padding-box;
+}
+
+/* ── Badge ──────────────────────────────────────────────────── */
+.badge-new {
+  background: linear-gradient(135deg, var(--accent), var(--accent-dark));
+  color: var(--bg-primary);
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 2px 6px;
+  border-radius: 2px;
+}
+
+/* ── Hero noise texture overlay ─────────────────────────────── */
+.noise-overlay {
+  position: relative;
+}
+.noise-overlay::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+  pointer-events: none;
+  z-index: 1;
+}
+.noise-overlay > * { position: relative; z-index: 2; }
+
+/* ── Hover underline ────────────────────────────────────────── */
+.hover-underline {
+  position: relative;
+}
+.hover-underline::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 0;
+  height: 1px;
+  background: var(--accent);
+  transition: width 0.3s cubic-bezier(0.19, 1, 0.22, 1);
+}
+.hover-underline:hover::after { width: 100%; }
+
+/* ── Custom checkbox ────────────────────────────────────────── */
+input[type="checkbox"] {
+  accent-color: var(--accent);
+}
+
+/* ── Modal overlay ──────────────────────────────────────────── */
+.modal-overlay {
+  background: rgba(12, 10, 9, 0.85);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+}
