@@ -8,18 +8,28 @@ import {
   isNewAsset,
 } from '@/lib/utils'
 
+// Server-only guard (recommended for Next.js)
+import 'server-only'
+
+const DROPBOX_ACCESS_TOKEN = process.env.DROPBOX_ACCESS_TOKEN
+if (!DROPBOX_ACCESS_TOKEN) {
+  throw new Error(
+    'Missing DROPBOX_ACCESS_TOKEN. Set it in your environment (server-side) before calling Dropbox helpers.'
+  )
+}
+
 const DROPBOX_API = 'https://api.dropboxapi.com/2'
 const DROPBOX_CONTENT = 'https://content.dropboxapi.com/2'
 
-function dbxHeaders(extra?: Record<string, string>) {
+function dbxHeaders(extra?: Record<string, string>): Record<string, string> {
   return {
-    Authorization: `Bearer ${process.env.DROPBOX_ACCESS_TOKEN}`,
+    Authorization: `Bearer ${DROPBOX_ACCESS_TOKEN}`,
     'Content-Type': 'application/json',
     ...extra,
   }
 }
 
-export async function listDropboxFolder(path: string = ''): Promise<DropboxFolderEntry[]> {
+export async function listDropboxFolder(path = ''): Promise<DropboxFolderEntry[]> {
   const entries: DropboxFolderEntry[] = []
   let cursor: string | null = null
   let hasMore = true
@@ -45,8 +55,8 @@ export async function listDropboxFolder(path: string = ''): Promise<DropboxFolde
     })
 
     if (!res.ok) {
-      const err = await res.text()
-      console.error('[Dropbox] list_folder error:', err)
+      const errText = await res.text()
+      console.error('[Dropbox] list_folder error:', errText)
       throw new Error(`Dropbox API error: ${res.status}`)
     }
 
@@ -79,7 +89,7 @@ async function getThumbnailBase64(path: string): Promise<string | undefined> {
     const res = await fetch(`${DROPBOX_CONTENT}/files/get_thumbnail_v2`, {
       method: 'POST',
       headers: {
-        Authorization: `Bearer ${process.env.DROPBOX_ACCESS_TOKEN}`,
+        Authorization: `Bearer ${DROPBOX_ACCESS_TOKEN}`,
         'Dropbox-API-Arg': JSON.stringify({
           resource: { '.tag': 'path', path },
           format: { '.tag': 'jpeg' },
@@ -91,6 +101,7 @@ async function getThumbnailBase64(path: string): Promise<string | undefined> {
     })
 
     if (!res.ok) return undefined
+
     const buffer = await res.arrayBuffer()
     const b64 = Buffer.from(buffer).toString('base64')
     return `data:image/jpeg;base64,${b64}`
@@ -102,7 +113,7 @@ async function getThumbnailBase64(path: string): Promise<string | undefined> {
 export function entryToAsset(
   entry: DropboxFolderEntry & { server_modified?: string; size?: number },
   collectionPath: string,
-  collectionName: string,
+  collectionName: string
 ): Asset | null {
   if (entry['.tag'] !== 'file') return null
 
@@ -134,15 +145,76 @@ export function entryToAsset(
 function inferTags(filename: string, collection: string): string[] {
   const tags: string[] = []
   const nameLower = filename.toLowerCase()
+
   if (collection) tags.push(collection.toLowerCase())
+
   const keywords = [
-    'logo', 'icon', 'banner', 'social', 'print', 'web', 'dark', 'light',
-    'horizontal', 'vertical', 'full', 'square', 'template', 'brand',
-    'color', 'typography', 'guide', 'lockup', 'wordmark',
+    // brand general
+    'logo',
+    'icon',
+    'banner',
+    'social',
+    'print',
+    'web',
+    'dark',
+    'light',
+    'horizontal',
+    'vertical',
+    'full',
+    'square',
+    'template',
+    'brand',
+    'color',
+    'typography',
+    'guide',
+    'lockup',
+    'wordmark',
+
+    // Grab & Go product-ish keywords (optional, helps search)
+    'grab',
+    'go',
+    'grabngo',
+    'preroll',
+    'pre-roll',
+    'joint',
+    'tube',
+    'closed',
+    'infused',
+    'noninfused',
+    'non-infused',
+    '1g',
+    '12',
+    '28',
+    'pack',
+    'matte',
+    'pouch',
+    'stand-up',
+    'standup',
+    'shake',
+    'shakebomb',
+    'gummy',
+    'gummies',
+    'fruit',
+    'fight',
+    'super',
+    'lemon',
+
+    // strains you showed
+    'king',
+    'louis',
+    'sunset',
+    'diesel',
+    'space',
+    'runtz',
+    'platinum',
+    'cookies',
+    'grape',
   ]
+
   keywords.forEach(kw => {
     if (nameLower.includes(kw)) tags.push(kw)
   })
+
   return [...new Set(tags)]
 }
 
@@ -154,15 +226,13 @@ export async function buildCollections(rootPath = ''): Promise<Collection[]> {
     folders.map(async (folder): Promise<Collection> => {
       const subEntries = await listDropboxFolder(folder.path_display)
       const files = subEntries.filter(e => e['.tag'] === 'file')
-
       const assets = files
         .map(f => entryToAsset(f as DropboxFolderEntry, folder.path_display, folder.name))
         .filter((a): a is Asset => a !== null)
 
-      // Get thumbnail for first image in folder
+      // cover: thumbnail for first image in folder
       const firstImage = assets.find(a => a.type === 'image' || a.type === 'svg')
       let coverAsset = firstImage
-
       if (firstImage) {
         const thumbUrl = await getThumbnailBase64(firstImage.path)
         if (thumbUrl) {
@@ -200,7 +270,6 @@ export async function fetchAllAssets(rootPath = ''): Promise<Asset[]> {
     const folderEntries = await listDropboxFolder(folder.path_display)
     const folderFiles = folderEntries.filter(e => e['.tag'] === 'file')
 
-    // Fetch thumbnails for images in batches
     const assets = await Promise.all(
       folderFiles.map(async f => {
         const asset = entryToAsset(f as DropboxFolderEntry, folder.path_display, folder.name)
@@ -208,15 +277,16 @@ export async function fetchAllAssets(rootPath = ''): Promise<Asset[]> {
 
         if (asset.type === 'image') {
           const thumbUrl = await getThumbnailBase64(asset.path)
-          if (thumbUrl) {
-            return { ...asset, thumbnailUrl: thumbUrl }
-          }
+          if (thumbUrl) return { ...asset, thumbnailUrl: thumbUrl }
         }
+
         return asset
       })
     )
 
-    assets.forEach(a => { if (a) allAssets.push(a) })
+    assets.forEach(a => {
+      if (a) allAssets.push(a)
+    })
   }
 
   return allAssets.sort(
