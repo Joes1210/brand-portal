@@ -39,7 +39,7 @@ export default function HomePage() {
       <main>
         {/* Hero */}
         <section
-          className="noise-overlay relative py-20 lg:py-28 flex flex-col items-center justify-start px-6 text-center overflow-hidden"
+          className="noise-overlay relative py-12 lg:py-16 flex flex-col items-start justify-start px-6 text-center overflow-hidden"
           style={{ background: 'var(--gradient-hero)' }}
         >
           <div
@@ -64,7 +64,7 @@ export default function HomePage() {
 
             {/* Eyebrow */}
             <div
-              className="inline-flex items-center gap-2 text-xs font-mono uppercase tracking-widest px-4 py-2 rounded-full mb-8"
+              className="inline-flex items-start gap-2 text-xs font-mono uppercase tracking-widest px-4 py-2 rounded-full mb-8"
               style={{
                 background: 'rgba(0,0,0,0.3)',
                 border: '1px solid var(--accent-gold)',
@@ -97,10 +97,10 @@ export default function HomePage() {
             </p>
 
             {/* CTAs */}
-            <div className="flex flex-col sm:flex-row items-center justify-start gap-3">
+            <div className="flex flex-col sm:flex-row items-start justify-start gap-3">
               <button
                 onClick={() => setSearchOpen(true)}
-                className="flex items-center gap-3 px-6 py-3.5 rounded-xl text-sm font-medium transition-all duration-300 hover:opacity-80"
+                className="flex items-start gap-3 px-6 py-3.5 rounded-xl text-sm font-medium transition-all duration-300 hover:opacity-80"
                 style={{
                   background: 'rgba(255,255,255,0.1)',
                   color: '#ffffff',
@@ -119,7 +119,7 @@ export default function HomePage() {
               </button>
               <Link
                 href="/library"
-                className="flex items-center gap-2 px-6 py-3.5 rounded-xl text-sm font-medium transition-all duration-300 hover:opacity-90"
+                className="flex items-start gap-2 px-6 py-3.5 rounded-xl text-sm font-medium transition-all duration-300 hover:opacity-90"
                 style={{ background: 'var(--accent-gold)', color: '#0d2b0d', fontWeight: 700 }}
               >
                 Browse Library
@@ -130,7 +130,7 @@ export default function HomePage() {
 
           {/* Stats */}
           <div
-            className="absolute bottom-0 left-0 right-0 flex items-center justify-start gap-0 overflow-x-auto"
+            className="absolute bottom-0 left-0 right-0 flex items-start justify-start gap-0 overflow-x-auto"
             style={{ borderTop: '1px solid rgba(255,255,255,0.1)' }}
           >
             {stats.map((stat, i) => (
@@ -170,7 +170,7 @@ export default function HomePage() {
             </div>
             <Link
               href="/library"
-              className="hidden sm:flex items-center gap-2 text-sm transition-opacity hover:opacity-70"
+              className="hidden sm:flex items-start gap-2 text-sm transition-opacity hover:opacity-70"
               style={{ color: 'var(--text-muted)' }}
             >
               View all <ArrowRight size={14} />
@@ -191,7 +191,7 @@ export default function HomePage() {
           <div className="mx-auto max-w-[1600px] px-6 lg:px-10">
             <div className="flex items-end justify-between mb-10">
               <div>
-                <div className="flex items-center gap-2 mb-2">
+                <div className="flex items-start gap-2 mb-2">
                   <Clock size={12} style={{ color: 'var(--accent-gold)' }} />
                   <p className="text-xs font-mono uppercase tracking-widest" style={{ color: 'var(--accent-gold)' }}>
                     Recent
@@ -203,7 +203,7 @@ export default function HomePage() {
               </div>
               <Link
                 href="/library?sort=date-desc"
-                className="hidden sm:flex items-center gap-2 text-sm transition-opacity hover:opacity-70"
+                className="hidden sm:flex items-start gap-2 text-sm transition-opacity hover:opacity-70"
                 style={{ color: 'var(--text-muted)' }}
               >
                 See all new <ArrowRight size={14} />
@@ -226,7 +226,7 @@ export default function HomePage() {
             className="rounded-3xl overflow-hidden relative noise-overlay"
             style={{ background: 'linear-gradient(135deg, #0d2b0d 0%, #2e8b2e 100%)' }}
           >
-            <div className="px-10 py-16 lg:py-20 flex flex-col lg:flex-row items-center justify-between gap-8">
+            <div className="px-10 py-16 lg:py-20 flex flex-col lg:flex-row items-start justify-between gap-8">
               <div>
                 <h2
                   className="font-display text-4xl lg:text-5xl font-semibold mb-4"
@@ -239,16 +239,16 @@ export default function HomePage() {
                   including high-res photography and exclusive marketing materials.
                 </p>
               </div>
-              <div className="flex flex-col sm:flex-row items-center gap-3 shrink-0">
+              <div className="flex flex-col sm:flex-row items-start gap-3 shrink-0">
                 <Link
                   href="/library"
-                  className="flex items-center gap-2 px-7 py-3.5 rounded-xl text-sm font-medium"
+                  className="flex items-start gap-2 px-7 py-3.5 rounded-xl text-sm font-medium"
                   style={{ background: 'rgba(255,255,255,0.15)', color: '#ffffff', border: '1px solid rgba(255,255,255,0.3)' }}
                 >
                   Browse Public Assets
                 </Link>
                 <button
-                  className="flex items-center gap-2 px-7 py-3.5 rounded-xl text-sm font-medium hover:opacity-90"
+                  className="flex items-start gap-2 px-7 py-3.5 rounded-xl text-sm font-medium hover:opacity-90"
                   style={{ background: 'var(--accent-gold)', color: '#0d2b0d', fontWeight: 700 }}
                 >
                   Request Access <ArrowRight size={14} />
