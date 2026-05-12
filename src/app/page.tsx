@@ -39,7 +39,7 @@ export default function HomePage() {
       <main>
         {/* Hero */}
         <section
-          className="noise-overlay relative py-12 lg:py-16 flex flex-col items-start justify-start px-6 text-center overflow-hidden"
+          className="noise-overlay relative pt-8 pb-16 flex flex-col items-start justify-start px-6 text-left overflow-hidden "
           style={{ background: 'var(--gradient-hero)' }}
         >
           <div
@@ -51,7 +51,7 @@ export default function HomePage() {
             style={{ background: 'var(--accent-gold)' }}
           />
 
-          <div className="relative z-10 max-w-4xl mx-auto">
+          <div className="relative z-10 w-full max-w-[1600px]">
 
             {/* Logo */}
             <div className="flex justify-start mb-8">
