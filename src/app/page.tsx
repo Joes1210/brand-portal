@@ -39,7 +39,7 @@ export default function HomePage() {
       <main>
         {/* Hero */}
         <section
-          className="noise-overlay relative min-h-screen flex flex-col items-center justify-center px-6 text-center overflow-hidden"
+          className="noise-overlay relative py-20 lg:py-28 flex flex-col items-center justify-start px-6 text-center overflow-hidden"
           style={{ background: 'var(--gradient-hero)' }}
         >
           <div
@@ -54,11 +54,11 @@ export default function HomePage() {
           <div className="relative z-10 max-w-4xl mx-auto">
 
             {/* Logo */}
-            <div className="flex justify-center mb-8">
+            <div className="flex justify-start mb-8">
               <img
                 src="/Logo_3d.png"
                 alt="Grab & Go"
-                className="h-36 w-auto drop-shadow-2xl"
+                className="h-48 sm:h-52 lg:h-56 w-auto drop-shadow-2xl"
               />
             </div>
 
@@ -97,7 +97,7 @@ export default function HomePage() {
             </p>
 
             {/* CTAs */}
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
+            <div className="flex flex-col sm:flex-row items-center justify-start gap-3">
               <button
                 onClick={() => setSearchOpen(true)}
                 className="flex items-center gap-3 px-6 py-3.5 rounded-xl text-sm font-medium transition-all duration-300 hover:opacity-80"
@@ -130,7 +130,7 @@ export default function HomePage() {
 
           {/* Stats */}
           <div
-            className="absolute bottom-0 left-0 right-0 flex items-center justify-center gap-0 overflow-x-auto"
+            className="absolute bottom-0 left-0 right-0 flex items-center justify-start gap-0 overflow-x-auto"
             style={{ borderTop: '1px solid rgba(255,255,255,0.1)' }}
           >
             {stats.map((stat, i) => (
