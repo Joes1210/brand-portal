@@ -8,10 +8,6 @@ import {
   isNewAsset,
 } from '@/lib/utils'
 
-// ── Dropbox API client ────────────────────────────────────────
-// Uses the Dropbox HTTP API v2 directly for maximum control.
-// Set DROPBOX_ACCESS_TOKEN in your .env.local
-
 const DROPBOX_API = 'https://api.dropboxapi.com/2'
 const DROPBOX_CONTENT = 'https://content.dropboxapi.com/2'
 
@@ -23,10 +19,7 @@ function dbxHeaders(extra?: Record<string, string>) {
   }
 }
 
-// ── List folder contents ──────────────────────────────────────
-export async function listDropboxFolder(
-  path: string = '',
-): Promise<DropboxFolderEntry[]> {
+export async function listDropboxFolder(path: string = ''): Promise<DropboxFolderEntry[]> {
   const entries: DropboxFolderEntry[] = []
   let cursor: string | null = null
   let hasMore = true
@@ -43,7 +36,6 @@ export async function listDropboxFolder(
           recursive: false,
           include_media_info: true,
           include_deleted: false,
-          include_has_explicit_shared_members: false,
         }
 
     const res = await fetch(url, {
@@ -67,7 +59,6 @@ export async function listDropboxFolder(
   return entries
 }
 
-// ── Get temporary download link ───────────────────────────────
 export async function getTemporaryLink(path: string): Promise<string> {
   const res = await fetch(`${DROPBOX_API}/files/get_temporary_link`, {
     method: 'POST',
@@ -79,9 +70,7 @@ export async function getTemporaryLink(path: string): Promise<string> {
   return data.link
 }
 
-// ── Get thumbnail ─────────────────────────────────────────────
-export async function getDropboxThumbnailUrl(path: string, size = 'w256h256'): Promise<string | undefined> {
-  // Only images support thumbnails in Dropbox API
+async function getThumbnailBase64(path: string): Promise<string | undefined> {
   const ext = getFileExtension(path)
   const imageExts = ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'tiff', 'webp']
   if (!imageExts.includes(ext)) return undefined
@@ -94,7 +83,7 @@ export async function getDropboxThumbnailUrl(path: string, size = 'w256h256'): P
         'Dropbox-API-Arg': JSON.stringify({
           resource: { '.tag': 'path', path },
           format: { '.tag': 'jpeg' },
-          size: { '.tag': size },
+          size: { '.tag': 'w256h256' },
           mode: { '.tag': 'fitone_bestfit' },
         }),
         'Content-Type': 'text/plain; charset=utf-8',
@@ -110,42 +99,6 @@ export async function getDropboxThumbnailUrl(path: string, size = 'w256h256'): P
   }
 }
 
-// ── Build shared link ─────────────────────────────────────────
-export async function createSharedLink(path: string): Promise<string | undefined> {
-  try {
-    const res = await fetch(`${DROPBOX_API}/sharing/create_shared_link_with_settings`, {
-      method: 'POST',
-      headers: dbxHeaders(),
-      body: JSON.stringify({
-        path,
-        settings: {
-          requested_visibility: { '.tag': 'public' },
-          audience: { '.tag': 'public' },
-          access: { '.tag': 'viewer' },
-        },
-      }),
-    })
-    if (!res.ok) {
-      // If link already exists, fetch it
-      const existing = await fetch(`${DROPBOX_API}/sharing/list_shared_links`, {
-        method: 'POST',
-        headers: dbxHeaders(),
-        body: JSON.stringify({ path, direct_only: true }),
-      })
-      if (existing.ok) {
-        const d = await existing.json()
-        return d.links?.[0]?.url?.replace('?dl=0', '?dl=1')
-      }
-      return undefined
-    }
-    const d = await res.json()
-    return d.url?.replace('?dl=0', '?dl=1')
-  } catch {
-    return undefined
-  }
-}
-
-// ── Transform entry to Asset ──────────────────────────────────
 export function entryToAsset(
   entry: DropboxFolderEntry & { server_modified?: string; size?: number },
   collectionPath: string,
@@ -173,20 +126,15 @@ export function entryToAsset(
     collection: collectionName,
     collectionPath,
     isNew: isNewAsset(modified),
-    access: 'public', // default; expand with auth rules later
+    access: 'public',
     mimeType: getMimeType(ext),
   }
 }
 
-// ── Infer tags from filename + folder ────────────────────────
 function inferTags(filename: string, collection: string): string[] {
   const tags: string[] = []
   const nameLower = filename.toLowerCase()
-
-  // Collection as tag
   if (collection) tags.push(collection.toLowerCase())
-
-  // Common brand asset keywords
   const keywords = [
     'logo', 'icon', 'banner', 'social', 'print', 'web', 'dark', 'light',
     'horizontal', 'vertical', 'full', 'square', 'template', 'brand',
@@ -195,11 +143,9 @@ function inferTags(filename: string, collection: string): string[] {
   keywords.forEach(kw => {
     if (nameLower.includes(kw)) tags.push(kw)
   })
-
   return [...new Set(tags)]
 }
 
-// ── Recursively build collections ─────────────────────────────
 export async function buildCollections(rootPath = ''): Promise<Collection[]> {
   const entries = await listDropboxFolder(rootPath)
   const folders = entries.filter(e => e['.tag'] === 'folder')
@@ -208,24 +154,21 @@ export async function buildCollections(rootPath = ''): Promise<Collection[]> {
     folders.map(async (folder): Promise<Collection> => {
       const subEntries = await listDropboxFolder(folder.path_display)
       const files = subEntries.filter(e => e['.tag'] === 'file')
-      const subFolders = subEntries.filter(e => e['.tag'] === 'folder')
 
       const assets = files
         .map(f => entryToAsset(f as DropboxFolderEntry, folder.path_display, folder.name))
         .filter((a): a is Asset => a !== null)
 
-      // Nested collections (one level deep for perf)
-      const subCollections: Collection[] = subFolders.map(sf => ({
-        id: sf.id,
-        name: sf.name,
-        path: sf.path_display,
-        assetCount: 0, // lazy-loaded
-        access: 'public' as const,
-        lastModified: new Date().toISOString(),
-      }))
+      // Get thumbnail for first image in folder
+      const firstImage = assets.find(a => a.type === 'image' || a.type === 'svg')
+      let coverAsset = firstImage
 
-      // Use first image as cover
-      const coverAsset = assets.find(a => a.type === 'image' || a.type === 'svg')
+      if (firstImage) {
+        const thumbUrl = await getThumbnailBase64(firstImage.path)
+        if (thumbUrl) {
+          coverAsset = { ...firstImage, thumbnailUrl: thumbUrl }
+        }
+      }
 
       return {
         id: folder.id,
@@ -233,7 +176,6 @@ export async function buildCollections(rootPath = ''): Promise<Collection[]> {
         path: folder.path_display,
         assetCount: files.length,
         coverAsset,
-        subCollections,
         access: 'public',
         lastModified: new Date().toISOString(),
       }
@@ -243,31 +185,38 @@ export async function buildCollections(rootPath = ''): Promise<Collection[]> {
   return collections
 }
 
-// ── Fetch all assets from all folders ─────────────────────────
 export async function fetchAllAssets(rootPath = ''): Promise<Asset[]> {
   const entries = await listDropboxFolder(rootPath)
   const allAssets: Asset[] = []
 
-  // Root-level files
   const rootFiles = entries.filter(e => e['.tag'] === 'file')
   rootFiles.forEach(f => {
     const asset = entryToAsset(f as DropboxFolderEntry, rootPath, 'General')
     if (asset) allAssets.push(asset)
   })
 
-  // Folder files
   const folders = entries.filter(e => e['.tag'] === 'folder')
   for (const folder of folders) {
     const folderEntries = await listDropboxFolder(folder.path_display)
     const folderFiles = folderEntries.filter(e => e['.tag'] === 'file')
-    folderFiles.forEach(f => {
-      const asset = entryToAsset(
-        f as DropboxFolderEntry,
-        folder.path_display,
-        folder.name,
-      )
-      if (asset) allAssets.push(asset)
-    })
+
+    // Fetch thumbnails for images in batches
+    const assets = await Promise.all(
+      folderFiles.map(async f => {
+        const asset = entryToAsset(f as DropboxFolderEntry, folder.path_display, folder.name)
+        if (!asset) return null
+
+        if (asset.type === 'image') {
+          const thumbUrl = await getThumbnailBase64(asset.path)
+          if (thumbUrl) {
+            return { ...asset, thumbnailUrl: thumbUrl }
+          }
+        }
+        return asset
+      })
+    )
+
+    assets.forEach(a => { if (a) allAssets.push(a) })
   }
 
   return allAssets.sort(
