@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { Search, ArrowRight, Sparkles, Clock } from 'lucide-react'
+
 import { Navbar } from '@/components/layout/Navbar'
 import { Footer } from '@/components/layout/Footer'
 import { CollectionCard, CollectionCardSkeleton } from '@/components/assets/CollectionCard'
@@ -15,6 +16,7 @@ import type { Asset } from '@/types'
 export default function HomePage() {
   const { assets, isLoading: assetsLoading } = useAssets()
   const { collections, isLoading: collectionsLoading } = useCollections()
+
   const [selectedAsset, setSelectedAsset] = useState<Asset | null>(null)
   const [searchOpen, setSearchOpen] = useState(false)
 
@@ -39,7 +41,7 @@ export default function HomePage() {
       <main>
         {/* Hero */}
         <section
-          className="noise-overlay relative pt-8 pb-16 flex flex-col items-start justify-start px-6 text-left overflow-hidden "
+          className="noise-overlay relative px-6 pt-10 pb-0 flex flex-col items-center justify-start text-center overflow-hidden"
           style={{ background: 'var(--gradient-hero)' }}
         >
           <div
@@ -51,10 +53,9 @@ export default function HomePage() {
             style={{ background: 'var(--accent-gold)' }}
           />
 
-          <div className="relative z-10 w-full max-w-[1600px]">
-
+          <div className="relative z-10 w-full max-w-5xl mx-auto">
             {/* Logo */}
-            <div className="flex justify-start mb-8">
+            <div className="flex justify-center mb-8">
               <img
                 src="/Logo_3d.png"
                 alt="Grab & Go"
@@ -64,7 +65,7 @@ export default function HomePage() {
 
             {/* Eyebrow */}
             <div
-              className="inline-flex items-start gap-2 text-xs font-mono uppercase tracking-widest px-4 py-2 rounded-full mb-8"
+              className="inline-flex items-center gap-2 text-xs font-mono uppercase tracking-widest px-4 py-2 rounded-full mb-8"
               style={{
                 background: 'rgba(0,0,0,0.3)',
                 border: '1px solid var(--accent-gold)',
@@ -92,15 +93,14 @@ export default function HomePage() {
               className="text-lg leading-relaxed max-w-xl mx-auto mb-10"
               style={{ color: 'rgba(255,255,255,0.65)' }}
             >
-              Your single source of truth for logos, photography, templates, brand
-              guidelines, and all approved creative assets.
+              Your single source of truth for logos, photography, templates, brand guidelines, and all approved creative assets.
             </p>
 
             {/* CTAs */}
-            <div className="flex flex-col sm:flex-row items-start justify-start gap-3">
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
               <button
                 onClick={() => setSearchOpen(true)}
-                className="flex items-start gap-3 px-6 py-3.5 rounded-xl text-sm font-medium transition-all duration-300 hover:opacity-80"
+                className="flex items-center gap-3 px-6 py-3.5 rounded-xl text-sm font-medium transition-all duration-300 hover:opacity-80"
                 style={{
                   background: 'rgba(255,255,255,0.1)',
                   color: '#ffffff',
@@ -117,43 +117,44 @@ export default function HomePage() {
                   ⌘K
                 </kbd>
               </button>
+
               <Link
                 href="/library"
-                className="flex items-start gap-2 px-6 py-3.5 rounded-xl text-sm font-medium transition-all duration-300 hover:opacity-90"
+                className="flex items-center gap-2 px-6 py-3.5 rounded-xl text-sm font-medium transition-all duration-300 hover:opacity-90"
                 style={{ background: 'var(--accent-gold)', color: '#0d2b0d', fontWeight: 700 }}
               >
                 Browse Library
                 <ArrowRight size={15} />
               </Link>
             </div>
-          </div>
 
-          {/* Stats */}
-          <div
-            className="absolute bottom-0 left-0 right-0 flex items-start justify-start gap-0 overflow-x-auto"
-            style={{ borderTop: '1px solid rgba(255,255,255,0.1)' }}
-          >
-            {stats.map((stat, i) => (
-              <div
-                key={stat.label}
-                className="flex-1 min-w-[140px] py-5 px-6 text-center"
-                style={{
-                  borderLeft: i > 0 ? '1px solid rgba(255,255,255,0.1)' : 'none',
-                  background: 'rgba(0,0,0,0.2)',
-                  backdropFilter: 'blur(8px)',
-                }}
-              >
+            {/* Stats (flow layout to avoid big gap) */}
+            <div
+              className="mt-10 flex items-start justify-center gap-0 overflow-x-auto"
+              style={{ borderTop: '1px solid rgba(255,255,255,0.1)' }}
+            >
+              {stats.map((stat, i) => (
                 <div
-                  className="font-display text-3xl font-semibold"
-                  style={{ color: 'var(--accent-gold)' }}
+                  key={stat.label}
+                  className="flex-1 min-w-[140px] py-5 px-6 text-center"
+                  style={{
+                    borderLeft: i > 0 ? '1px solid rgba(255,255,255,0.1)' : 'none',
+                    background: 'rgba(0,0,0,0.2)',
+                    backdropFilter: 'blur(8px)',
+                  }}
                 >
-                  {stat.value}
+                  <div
+                    className="font-display text-3xl font-semibold"
+                    style={{ color: 'var(--accent-gold)' }}
+                  >
+                    {stat.value}
+                  </div>
+                  <div className="text-xs font-mono uppercase tracking-wider mt-1" style={{ color: 'rgba(255,255,255,0.5)' }}>
+                    {stat.label}
+                  </div>
                 </div>
-                <div className="text-xs font-mono uppercase tracking-wider mt-1" style={{ color: 'rgba(255,255,255,0.5)' }}>
-                  {stat.label}
-                </div>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
         </section>
 
@@ -170,19 +171,17 @@ export default function HomePage() {
             </div>
             <Link
               href="/library"
-              className="hidden sm:flex items-start gap-2 text-sm transition-opacity hover:opacity-70"
+              className="hidden sm:flex items-center gap-2 text-sm transition-opacity hover:opacity-70"
               style={{ color: 'var(--text-muted)' }}
             >
               View all <ArrowRight size={14} />
             </Link>
           </div>
+
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
             {collectionsLoading
               ? Array.from({ length: 4 }).map((_, i) => <CollectionCardSkeleton key={i} />)
-              : collections.slice(0, 8).map(col => (
-                  <CollectionCard key={col.id} collection={col} />
-                ))
-            }
+              : collections.slice(0, 8).map(col => <CollectionCard key={col.id} collection={col} />)}
           </div>
         </section>
 
@@ -191,7 +190,7 @@ export default function HomePage() {
           <div className="mx-auto max-w-[1600px] px-6 lg:px-10">
             <div className="flex items-end justify-between mb-10">
               <div>
-                <div className="flex items-start gap-2 mb-2">
+                <div className="flex items-center gap-2 mb-2">
                   <Clock size={12} style={{ color: 'var(--accent-gold)' }} />
                   <p className="text-xs font-mono uppercase tracking-widest" style={{ color: 'var(--accent-gold)' }}>
                     Recent
@@ -203,19 +202,19 @@ export default function HomePage() {
               </div>
               <Link
                 href="/library?sort=date-desc"
-                className="hidden sm:flex items-start gap-2 text-sm transition-opacity hover:opacity-70"
+                className="hidden sm:flex items-center gap-2 text-sm transition-opacity hover:opacity-70"
                 style={{ color: 'var(--text-muted)' }}
               >
                 See all new <ArrowRight size={14} />
               </Link>
             </div>
+
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4">
               {assetsLoading
                 ? Array.from({ length: 6 }).map((_, i) => <AssetCardSkeleton key={i} />)
                 : (recentAssets.length > 0 ? recentAssets : allRecent).map(asset => (
                     <AssetCard key={asset.id} asset={asset} onPreview={setSelectedAsset} />
-                  ))
-              }
+                  ))}
             </div>
           </div>
         </section>
@@ -228,27 +227,24 @@ export default function HomePage() {
           >
             <div className="px-10 py-16 lg:py-20 flex flex-col lg:flex-row items-start justify-between gap-8">
               <div>
-                <h2
-                  className="font-display text-4xl lg:text-5xl font-semibold mb-4"
-                  style={{ color: '#ffffff' }}
-                >
+                <h2 className="font-display text-4xl lg:text-5xl font-semibold mb-4" style={{ color: '#ffffff' }}>
                   Need partner access?
                 </h2>
                 <p style={{ color: 'rgba(255,255,255,0.65)' }} className="text-base max-w-md leading-relaxed">
-                  Dispensaries and licensed partners can unlock additional assets
-                  including high-res photography and exclusive marketing materials.
+                  Dispensaries and licensed partners can unlock additional assets including high-res photography and exclusive marketing materials.
                 </p>
               </div>
+
               <div className="flex flex-col sm:flex-row items-start gap-3 shrink-0">
                 <Link
                   href="/library"
-                  className="flex items-start gap-2 px-7 py-3.5 rounded-xl text-sm font-medium"
+                  className="flex items-center gap-2 px-7 py-3.5 rounded-xl text-sm font-medium"
                   style={{ background: 'rgba(255,255,255,0.15)', color: '#ffffff', border: '1px solid rgba(255,255,255,0.3)' }}
                 >
                   Browse Public Assets
                 </Link>
                 <button
-                  className="flex items-start gap-2 px-7 py-3.5 rounded-xl text-sm font-medium hover:opacity-90"
+                  className="flex items-center gap-2 px-7 py-3.5 rounded-xl text-sm font-medium hover:opacity-90"
                   style={{ background: 'var(--accent-gold)', color: '#0d2b0d', fontWeight: 700 }}
                 >
                   Request Access <ArrowRight size={14} />
@@ -274,7 +270,10 @@ export default function HomePage() {
         assets={assets}
         isOpen={searchOpen}
         onClose={() => setSearchOpen(false)}
-        onSelect={asset => { setSelectedAsset(asset); setSearchOpen(false) }}
+        onSelect={asset => {
+          setSelectedAsset(asset)
+          setSearchOpen(false)
+        }}
       />
     </>
   )
